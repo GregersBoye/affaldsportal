@@ -44,3 +44,5 @@ class Portal{
 
     }
 }
+
+module.exports = Portal;

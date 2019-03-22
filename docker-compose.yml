@@ -21,8 +21,8 @@ services:
       ports:
         - "80:3000"
       volumes:
-        - ./api/src:/code/src
-        - ./api/public:/code/public
+#        - ./frontend/src:/code/src
+        - ./frontend/public:/code/public
     api:
       environment:
         - MYSQL_ROOT_PASSWORD=secret
