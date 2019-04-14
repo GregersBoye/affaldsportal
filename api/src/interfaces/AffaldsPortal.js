@@ -12,10 +12,25 @@ class Portal{
             'https://rebild-sb.renoweb.dk/Legacy/JService.asmx/GetAffaldsplanMateriel_mitAffald',
             data
         ).catch((error) => {
-            console.log(error);
-        });;
 
-        return JSON.parse(response.data.d).list;
+        });
+
+        const services = JSON.parse(response.data.d).list;
+
+        const nextDayQueue = services.map(async (service) => {
+            const list = await this.getId(service.id);
+
+            return Promise.resolve({
+                service: service.ordningnavn,
+                days: list });
+        });
+
+        return Promise.all(nextDayQueue).then((list) => {
+            return list;
+
+        })
+
+
     }
 
     async getAddress(address){
@@ -28,7 +43,7 @@ class Portal{
             'https://rebild-sb.renoweb.dk/Legacy/JService.asmx/Adresse_SearchByString',
             data
         ).catch((error) => {
-            console.log(error);
+
             return;
         });
         return JSON.parse(response.data.d).list[0];
@@ -40,11 +55,14 @@ class Portal{
      * @return {Promise.<void>}
      */
     async getId(materialId){
+        const data = {materialid: materialId};
+        console.log(data);
         const response = await axios.post(
             'https://rebild.renoweb.dk/Legacy/JService.asmx/GetCalender_mitAffald',
-            JSON.parse(materialId)
+            data
         ).catch((error) => {
-            console.log(error);
+            console.log(error.message);
+            console.log("something bad happened");
         });
 
         return JSON.parse(response.data.d).list;

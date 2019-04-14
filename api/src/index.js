@@ -16,7 +16,7 @@ const  con = mysql.createConnection({
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE
 });
-const cal = ical({domain: 'github.com', name: 'my first iCal'});
+
 
 app.get('/address/getId', async (req, res) => {
     const data = await portal.getId(req.query.materialid);
@@ -24,7 +24,7 @@ app.get('/address/getId', async (req, res) => {
 });
 
 app.get('/address/getServices', async (req, res) => {
-    const data = await portal.getServices(req.query.addId);
+    const data = await portal.getServices(req.query.addressId);
     res.send(data);
 });
 
@@ -35,22 +35,32 @@ app.get('/address/getAddress', async (req, res) => {
 
 app.get('/db', (req, res) => {
    con.query('show databases', (error, result) => {
-       console.log(result);
+
        res.send(result);
    })
 });
 
-app.get('/address/ical', (req, res) => {
-    cal.createEvent({
-        start: moment(),
-        end: moment().add(1, 'hour'),
-        summary: 'Example Event',
-        description: 'It works ;)',
-        url: 'http://sebbo.net/'
+app.get('/address/ical', async (req, res) => {
+    const cal = ical({domain: 'github.com', name: 'my first iCal'});
+    const data = await portal.getServices(req.query.addressId);
+
+    data.forEach((type) => {
+        type.days.forEach((day) => {
+
+            const result = day.slice(-10);
+
+            cal.createEvent({
+                start: moment(result, "DD-MM-YYYY"),
+                end: moment(result, "DD-MM-YYYY").add(1, 'hour'),
+                summary: type.service,
+                description: `Afhentning af ${type.service}`
+            });
+
+        });
     });
-    const icalPath = path.join(__dirname, '..', 'calendars', `${uniqid()}.ics`);
-    cal.saveSync(icalPath);
-    res.send(icalPath);
+
+
+     cal.serve(res);
 });
 
 app.listen(port, () =>{
