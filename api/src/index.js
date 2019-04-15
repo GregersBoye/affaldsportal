@@ -1,22 +1,11 @@
 const express = require('express');
 const app = express();
-const axios = require('axios');
 const ical = require('ical-generator');
 const port = 3000;
 const moment = require('moment');
-const uniqid = require('uniqid');
-const path = require('path');
-const mysql = require('mysql');
 const Portal = require('./interfaces/AffaldsPortal');
 
 const portal = new Portal();
-const  con = mysql.createConnection({
-    host: "mysql",
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
-});
-
 
 app.get('/address/getId', async (req, res) => {
     const data = await portal.getId(req.query.materialid);
@@ -33,16 +22,28 @@ app.get('/address/getAddress', async (req, res) => {
     res.send(data);
 });
 
-app.get('/db', (req, res) => {
-   con.query('show databases', (error, result) => {
-
-       res.send(result);
-   })
-});
-
 app.get('/address/ical', async (req, res) => {
-    const cal = ical({domain: 'github.com', name: 'my first iCal'});
+    const cal = ical({domain: 'gregersboye.com', name: 'Affaldsafhentning'});
     const data = await portal.getServices(req.query.addressId);
+    let format = 'ical';
+
+    if(typeof req.query.format !== 'undefined'){
+        format = req.query.format;
+    }
+
+    if(format.toLowerCase() === 'json'){
+        const result = data.reduce((accumulator, service) => {
+            const dayList = service.days.map((day) => {
+                return day.slice(-10);
+            });
+
+            accumulator[service.service]  = dayList;
+            return accumulator
+        }, {});
+
+        res.send(result);
+        return;
+    }
 
     data.forEach((type) => {
         type.days.forEach((day) => {
@@ -58,7 +59,6 @@ app.get('/address/ical', async (req, res) => {
 
         });
     });
-
 
      cal.serve(res);
 });

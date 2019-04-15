@@ -17,7 +17,18 @@ class Portal{
 
         const services = JSON.parse(response.data.d).list;
 
-        const nextDayQueue = services.map(async (service) => {
+        const nextDayQueue = services.reduce((accumulator, service) => {
+            const knownService = accumulator.some((item) => {
+                return item.ordningnavn === service.ordningnavn
+            });
+
+            if(!knownService){
+                accumulator.push(service);
+            }
+
+            return accumulator;
+
+        }, []).map(async (service) => {
             const list = await this.getId(service.id);
 
             return Promise.resolve({
@@ -26,6 +37,8 @@ class Portal{
         });
 
         return Promise.all(nextDayQueue).then((list) => {
+
+
             return list;
 
         })
@@ -56,7 +69,7 @@ class Portal{
      */
     async getId(materialId){
         const data = {materialid: materialId};
-        console.log(data);
+
         const response = await axios.post(
             'https://rebild.renoweb.dk/Legacy/JService.asmx/GetCalender_mitAffald',
             data
