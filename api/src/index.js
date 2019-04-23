@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const ical = require('ical-generator');
-const port = 3000;
+const port = 5000;
 const moment = require('moment');
 const Portal = require('./interfaces/AffaldsPortal');
 

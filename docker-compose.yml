@@ -19,6 +19,6 @@ services:
         dockerfile: Docker/API/Dockerfile
       working_dir: /code
       ports:
-        - "3000:3000"
+        - "5000:5000"
       volumes:
         - ./api/src:/code/src
