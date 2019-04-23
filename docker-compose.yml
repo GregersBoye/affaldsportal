@@ -1,17 +1,6 @@
 version: "3.1"
 services:
 
-    mysql:
-      image: mysql:5.7
-      container_name: affald-mysql
-      working_dir: /application
-      volumes:
-        - .:/application
-      environment:
-        - MYSQL_ROOT_PASSWORD=secret
-        - MYSQL_DATABASE=affald
-        - MYSQL_USER=default
-        - MYSQL_PASSWORD=secret
     frontend:
       container_name: affald-frontend
       build:
@@ -24,11 +13,6 @@ services:
 #        - ./frontend/src:/code/src
         - ./frontend/public:/code/public
     api:
-      environment:
-        - MYSQL_ROOT_PASSWORD=secret
-        - MYSQL_DATABASE=affald
-        - MYSQL_USER=default
-        - MYSQL_PASSWORD=secret
       container_name: affald-api
       build:
         context: .
