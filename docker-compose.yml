@@ -1,6 +1,5 @@
 version: "3.1"
 services:
-
     frontend:
       container_name: affald-frontend
       build:
@@ -10,7 +9,7 @@ services:
       ports:
         - "80:3000"
       volumes:
-#        - ./frontend/src:/code/src
+        - ./frontend/src:/code/src
         - ./frontend/public:/code/public
     api:
       container_name: affald-api
@@ -19,6 +18,6 @@ services:
         dockerfile: Docker/API/Dockerfile
       working_dir: /code
       ports:
-        - "5000:5000"
+        - "4000:4000"
       volumes:
         - ./api/src:/code/src
