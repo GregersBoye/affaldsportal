@@ -1,19 +1,22 @@
 import React, {Component} from "react";
 import "bulma";
+// import TypeSelector from './TypeSelector';
+
 
 class Main extends Component {
     constructor(props){
         super(props);
 
         this.state = {
-            address: 'my address'
+            address: ''
         }
     }
 
     handleChange = async (event) => {
         this.setState({address: event.target.value});
-        const result = await fetch("http://localhost:4000/address/getServices?addId=17034")
-        console.log(result);
+        const result = await fetch(`http://localhost:4000/address/getAddress/${event.target.value}`);
+        const data = await result.json();
+        console.log(data);
 
     };
     render() {
@@ -21,12 +24,22 @@ class Main extends Component {
             <section className="section">
                 <div className="container">
                     <h1 className="title">
-                        Hello World
+                        Affaldsportalen
                     </h1>
                     <p className="subtitle">
-                        My first website with <strong>Bulma</strong> and <strong>React</strong>!
+                        Se tider for hvornår du får hentet dagrenovation, genbrug og storskrald i kalender!
                     </p>
-                    <input type="text" value={this.state.address} onChange={this.handleChange}/>
+                    <div>
+                    <label htmlFor={"addressInput"}>Adresse: </label>
+                    <input id={'addressInput'} type="text" className={'input'}  value={this.state.address} onChange={this.handleChange}/>
+                    </div>
+                    <div>
+                        <div className="buttons has-addons">
+                            <span className="button is-success is-selected">Yes</span>
+                            <span className="button">Maybe</span>
+                            <span className="button">No</span>
+                        </div>
+                    </div>
                 </div>
             </section>
         );

@@ -6,4 +6,4 @@ COPY ./frontend/package.json /code/package.json
 RUN npm install -s
 RUN ls /code/src
 ENTRYPOINT ["npm"]
-CMD ["start"]
+CMD ["run", "watch"]

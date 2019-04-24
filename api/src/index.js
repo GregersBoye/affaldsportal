@@ -7,31 +7,35 @@ const Portal = require('./interfaces/AffaldsPortal');
 
 const portal = new Portal();
 
-app.get('/address/getId', async (req, res) => {
+app.get('/address/getId/:materialId', async (req, res) => {
+    console.log('address/getId was called');
     res.header("Access-Control-Allow-Origin", "*");
-    const data = await portal.getId(req.query.materialid);
+    const data = await portal.getId(req.params.materialid);
     res.send(data);
 });
 
-app.get('/address/getServices', async (req, res) => {
+app.get('/address/getServices/:addressId', async (req, res) => {
+    console.log('address/getServices was called');
     res.header("Access-Control-Allow-Origin", "*");
-    const data = await portal.getServices(req.query.addressId);
+    const data = await portal.getServices(req.params.addressId);
     res.send(data);
 });
 
-app.get('/address/getAddress', async (req, res) => {
+app.get('/address/getAddress/:address', async (req, res) => {
+    console.log('address/getAddress was called');
     res.header("Access-Control-Allow-Origin", "*");
-    const data = await portal.getAddress(req.query.address);
+    const data = await portal.getAddress(req.params.address);
     res.send(data);
 });
 
-app.get('heartbeat', (req, res) => {
+app.get('/heartbeat/:parameter', (req, res) => {
+    console.log(`heartbeat was called ${req.params.parameter}`);
     res.header("Access-Control-Allow-Origin", "*");
     res.send('ok');
 });
 
-app.get('/address/ical', async (req, res) => {
-
+app.get('/address/ical/:addressId', async (req, res) => {
+    console.log('address/ical was called');
     const cal = ical({domain: 'gregersboye.com', name: 'Affaldsafhentning'});
     const data = await portal.getServices(req.query.addressId);
     let format = 'ical';
