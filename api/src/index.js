@@ -7,30 +7,31 @@ const Portal = require('./interfaces/AffaldsPortal');
 
 const portal = new Portal();
 
+    app.use((res, req, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+
+        next();
+    });
 app.get('/address/getId/:materialId', async (req, res) => {
     console.log('address/getId was called');
-    res.header("Access-Control-Allow-Origin", "*");
     const data = await portal.getId(req.params.materialid);
     res.send(data);
 });
 
 app.get('/address/getServices/:addressId', async (req, res) => {
     console.log('address/getServices was called');
-    res.header("Access-Control-Allow-Origin", "*");
     const data = await portal.getServices(req.params.addressId);
     res.send(data);
 });
 
 app.get('/address/getAddress/:address', async (req, res) => {
     console.log('address/getAddress was called');
-    res.header("Access-Control-Allow-Origin", "*");
     const data = await portal.getAddress(req.params.address);
     res.send(data);
 });
 
 app.get('/heartbeat/:parameter', (req, res) => {
     console.log(`heartbeat was called ${req.params.parameter}`);
-    res.header("Access-Control-Allow-Origin", "*");
     res.send('ok');
 });
 
