@@ -12,8 +12,13 @@ class AddressSearch extends React.Component{
   handleChange = async (event) => {
     this.setState({address: event.target.value});
     const result = await fetch(`http://localhost:4000/address/getAddress/${event.target.value}`);
-    const data = await result.json();
-    console.log(data);
+    const {value: addressId, label: address} = await result.json();
+
+    if(addressId !== "0000"){
+      this.setState({
+        address: address
+      });
+    }
 
   };
 
