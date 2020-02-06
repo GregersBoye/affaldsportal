@@ -1,86 +1,88 @@
 const axios = require('axios');
 
-class Portal{
-    async getServices(addressId){
+class Portal {
+  async getServices(addressId) {
 
-        const data = {
-            adrid: addressId,
-            common: false
-        };
+    const data = {
+      adrid: addressId,
+      common: false
+    };
 
-        const response = await axios.post(
-            'https://rebild-sb.renoweb.dk/Legacy/JService.asmx/GetAffaldsplanMateriel_mitAffald',
-            data
-        ).catch((error) => {
+    const response = await axios.post(
+      'https://rebild-sb.renoweb.dk/Legacy/JService.asmx/GetAffaldsplanMateriel_mitAffald',
+      data
+    )
+      .catch((error) => {
+        console.log(error.message);
+      });
+    console.log(response);
+    const services = JSON.parse(response.data.d).list;
 
+    const nextDayQueue = services.reduce((accumulator, service) => {
+      const knownService = accumulator.some((item) => {
+        return item.ordningnavn === service.ordningnavn
+      });
+
+      if (!knownService) {
+        accumulator.push(service);
+      }
+
+      return accumulator;
+
+    }, [])
+      .map(async (service) => {
+        const list = await this.getId(service.id);
+
+        return Promise.resolve({
+          service: service.ordningnavn,
+          days: list
         });
+      });
 
-        const services = JSON.parse(response.data.d).list;
+    return Promise.all(nextDayQueue).then((list) => {
+      return list;
+    })
+  }
 
-        const nextDayQueue = services.reduce((accumulator, service) => {
-            const knownService = accumulator.some((item) => {
-                return item.ordningnavn === service.ordningnavn
-            });
+  static formatDate(date){
+    return moment(date.slice(-10), 'DD-MM-YYYY');
+  }
 
-            if(!knownService){
-                accumulator.push(service);
-            }
+  async getAddress(address) {
+    const data = {
+      addresswithmateriel: 3,
+      searchterm: address
+    };
 
-            return accumulator;
+    const response = await axios.post(
+      'https://rebild-sb.renoweb.dk/Legacy/JService.asmx/Adresse_SearchByString',
+      data
+    ).catch((error) => {
 
-        }, []).map(async (service) => {
-            const list = await this.getId(service.id);
+      return;
+    });
+    return JSON.parse(response.data.d).list[0];
 
-            return Promise.resolve({
-                service: service.ordningnavn,
-                days: list });
-        });
+  }
 
-        return Promise.all(nextDayQueue).then((list) => {
+  /**
+   * Fetches the
+   * @return {Promise.<void>}
+   */
+  async getId(materialId) {
+    const data = {materialid: materialId};
 
+    const response = await axios.post(
+      'https://rebild.renoweb.dk/Legacy/JService.asmx/GetCalender_mitAffald',
+      data
+    ).catch((error) => {
+      console.log(error.message);
+      console.log("something bad happened");
+    });
 
-            return list;
+    return JSON.parse(response.data.d).list;
 
-        })
-
-
-    }
-
-    async getAddress(address){
-        const data = {
-            addresswithmateriel:3,
-            searchterm:address
-        };
-
-        const response = await axios.post(
-            'https://rebild-sb.renoweb.dk/Legacy/JService.asmx/Adresse_SearchByString',
-            data
-        ).catch((error) => {
-
-            return;
-        });
-        return JSON.parse(response.data.d).list[0];
-
-    }
-
-    /**
-     * Fetches the
-     * @return {Promise.<void>}
-     */
-    async getId(materialId){
-        const data = {materialid: materialId};
-
-        const response = await axios.post(
-            'https://rebild.renoweb.dk/Legacy/JService.asmx/GetCalender_mitAffald',
-            data
-        ).catch((error) => {
-            console.log(error.message);
-            console.log("something bad happened");
-        });
-
-        return JSON.parse(response.data.d).list;
-
-    }
+  }
 }
 
 module.exports = Portal;

@@ -1,38 +1,46 @@
 import React from 'react';
+import TypeButton from './TypeButton';
 
-class TypeSelector extends React.Component{
-    constructor(props){
-        super(props);
+class TypeSelector extends React.Component {
+  constructor(props) {
+    super(props);
 
-        this.state = {
-            active: 'ical'
-        }
+    this.state = {
+      fileTypes :[
+        {name: 'ical', active: true},
+        {name: 'json', active: false},
+        // {name: 'rss', active: false}
+      ]
     }
+  }
 
-    switchType = (chosenType) => {
-        this.setState({active: chosenType});
+  setType = (chosenTypeName) => {
+    const newTypes = this.state.fileTypes.map((type) => {
+      return {
+        name: type.name,
+        active: (type.name === chosenTypeName)
+      }
+    });
 
-    };
+    this.setState({fileTypes: newTypes});
+    this.props.typeCallback(chosenTypeName);
+  };
 
-    render(){
+  render() {
+    console.log('rendering');
+    const buttons = this.state.fileTypes.map((fileType) =>
+      <TypeButton clickHandler={this.setType} fileType={fileType} />
+    );
 
-      const classes = {
-        json: this.state.active === 'json' ? 'button is-success': 'button',
-        ical: this.state.active === 'ical' ? 'button is-success': 'button',
-        rss: this.state.active === 'rss' ? 'button is-success': 'button',
-      };
-
-        return (
-          <div className={'field'}>
-            <label className={'label'}> Vælg type</label>
-          <div className="buttons has-addons">
-              <span className={classes.json} onClick={() => {this.switchType('json')}}>JSON</span>
-              <span className={classes.ical} onClick={() => {this.switchType('ical')}}>ICAL</span>
-              <span className={classes.rss}  onClick={() => {this.switchType('rss')}}>RSS</span>
-          </div>
-          </div>
-        );
-    }
+    return (
+      <div className={'field'}>
+        <label className={'label'}> Vælg type</label>
+        <div className="buttons has-addons">
+          {buttons}
+        </div>
+      </div>
+    );
+  }
 }
 
 export default TypeSelector;
